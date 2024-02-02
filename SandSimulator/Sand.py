@@ -20,30 +20,29 @@ class Sand:
         self.canvas = canvas
         self.square_side = square_side
 
-    def create_grain(self, mouse_pos: Coords):
-        grid_coords: Optional[Coords] = self.get_grid_coords(mouse_pos)
-        if grid_coords is None:
+    def create_grain(self, mouse_pos: Coords, matrix: [[], ...]):
+        grain_coords: Optional[Coords] = self.get_grain_coords(mouse_pos)
+        if grain_coords is None:
             return
-        self.draw_grain(grid_coords)
+        if matrix[grain_coords.x][grain_coords.y]:
+            self.draw_grain(grain_coords)
 
-    def get_grid_coords(self, mouse_pos: Coords) -> Optional[Coords]:
-        grid_x = mouse_pos.x // self.square_side
-        grid_y = mouse_pos.y // self.square_side
-        if self.are_valid_grid_coords(grid_x, grid_y, self.grid.WIDTH, self.grid.HEIGHT):
-            return Coords(grid_x, grid_y)
+    def get_grain_coords(self, mouse_pos: Coords) -> Optional[Coords]:
+        grain_x = mouse_pos.x // self.square_side
+        grain_y = mouse_pos.y // self.square_side
+        if self.are_valid_grid_coords(grain_x, grain_y, self.grid.WIDTH, self.grid.HEIGHT):
+            return Coords(grain_x, grain_y)
 
     @staticmethod
-    def are_valid_grid_coords(grid_x, grid_y, width, height) -> bool:
-        if grid_x not in range(0, width) or grid_y not in range(0, height):
-            return False
-        return True
+    def are_valid_grid_coords(grain_x, grain_y, width, height) -> bool:
+        return grain_x in range(0, width) and grain_y in range(0, height)
 
-    def draw_grain(self, grid_coords):
+    def draw_grain(self, grain_coords):
         self.canvas.create_rectangle(
-            grid_coords.x * self.square_side,
-            grid_coords.y * self.square_side,
-            grid_coords.x * self.square_side + self.square_side,
-            grid_coords.y * self.square_side + self.square_side,
+            grain_coords.x * self.square_side,
+            grain_coords.y * self.square_side,
+            grain_coords.x * self.square_side + self.square_side,
+            grain_coords.y * self.square_side + self.square_side,
             fill=self.get_next_color(),
             outline=""
         )

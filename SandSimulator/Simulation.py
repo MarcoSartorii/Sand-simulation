@@ -1,9 +1,9 @@
 from collections import namedtuple
-from threading import Thread
 from typing import Final
 import tkinter
-from CONSTS import BACKGROUND_COLOR, WIDTH, HEIGHT, GRID, FPS, SQUARE_SIDE, DRAW_GRID_LINES, Coords
+from CONSTS import BACKGROUND_COLOR, WIDTH, HEIGHT, GRID, FPS, GRAIN_SIDE_SIZE, DRAW_GRID_LINES, Coords
 from Sand import Sand
+
 Event = namedtuple("Event", "char")
 MILLISECONDS: Final = 1000 // FPS
 
@@ -13,12 +13,14 @@ class Simulation:
     canvas: tkinter.Canvas
     is_mouse_pressed: bool
     sand: Sand
+    matrix: [[], ...]
 
     def __init__(self):
         self.is_mouse_pressed = False
         self.init_gui()
         self.init_key_binds()
-        self.sand = Sand(self.canvas, GRID, SQUARE_SIDE)
+        self.sand = Sand(self.canvas, GRID, GRAIN_SIDE_SIZE)
+        self.matrix = self.init_matrix()
 
     def init_gui(self):
         self.window = tkinter.Tk()
@@ -36,8 +38,11 @@ class Simulation:
 
     def update(self):
         self.update_canvas()
+        mouse_x, mouse_y = self.get_mouse_pos()
+        mouse_coords = Coords(mouse_x, mouse_y)
         if self.is_mouse_pressed:
-            self.draw_sand()
+            self.draw_grain(mouse_coords)
+        self.update_matrix_gravity(mouse_coords)
         self.window.after(ms=MILLISECONDS, func=self.update)
 
     def update_canvas(self):
@@ -65,21 +70,38 @@ class Simulation:
             self.window.winfo_pointery() - self.window.winfo_rooty()
         )
 
-    def draw_sand(self):
-        mouse_coords = Coords(self.get_mouse_pos()[0], self.get_mouse_pos()[1])
-        self.sand.create_grain(mouse_coords)
+    def draw_grain(self, mouse_coords: Coords):
+        self.sand.create_grain(mouse_coords, self.matrix)
 
     def draw_grid_lines(self):
         for i in range(0, GRID.WIDTH):
             self.canvas.create_line(
-                i*SQUARE_SIDE,
+                i * GRAIN_SIDE_SIZE,
                 0,
-                i*SQUARE_SIDE,
-                GRID.HEIGHT*SQUARE_SIDE
+                i * GRAIN_SIDE_SIZE,
+                GRID.HEIGHT * GRAIN_SIDE_SIZE
             )
             self.canvas.create_line(
                 0,
-                i*SQUARE_SIDE,
-                GRID.WIDTH*SQUARE_SIDE,
-                i*SQUARE_SIDE,
+                i * GRAIN_SIDE_SIZE,
+                GRID.WIDTH * GRAIN_SIDE_SIZE,
+                i * GRAIN_SIDE_SIZE,
             )
+
+    @staticmethod
+    def init_matrix():
+        matrix: [[], ...] = []
+        for _ in range(0, GRID.HEIGHT):
+            row = []
+            for _ in range(0, GRID.WIDTH):
+                row.append(True)
+            matrix.append(row)
+        print(matrix)
+        return matrix
+
+    def update_matrix_gravity(self, mouse_coords):
+        grain_coords: Coords = self.sand.get_grain_coords(mouse_coords)
+        if grain_coords is None:
+            return
+        if self.matrix[grain_coords.x][grain_coords.y]:
+            self.matrix[grain_coords.x][grain_coords.y] = False

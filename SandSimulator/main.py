@@ -1,5 +1,3 @@
-import colorsys
-
 from Simulation import Simulation
 
 if __name__ == "__main__":
