@@ -41,8 +41,9 @@ class Simulation:
         mouse_x, mouse_y = self.get_mouse_pos()
         mouse_coords = Coords(mouse_x, mouse_y)
         if self.is_mouse_pressed:
-            self.draw_grain(mouse_coords)
-        self.update_matrix_gravity(mouse_coords)
+            if self.draw_grain(mouse_coords):
+                self.update_matrix(mouse_coords)
+        self.make_fall()
         self.window.after(ms=MILLISECONDS, func=self.update)
 
     def update_canvas(self):
@@ -70,8 +71,8 @@ class Simulation:
             self.window.winfo_pointery() - self.window.winfo_rooty()
         )
 
-    def draw_grain(self, mouse_coords: Coords):
-        self.sand.create_grain(mouse_coords, self.matrix)
+    def draw_grain(self, mouse_coords: Coords) -> bool:
+        return self.sand.create_grain(mouse_coords, self.matrix)
 
     def draw_grid_lines(self):
         for i in range(0, GRID.WIDTH):
@@ -96,12 +97,16 @@ class Simulation:
             for _ in range(0, GRID.WIDTH):
                 row.append(True)
             matrix.append(row)
-        print(matrix)
         return matrix
 
-    def update_matrix_gravity(self, mouse_coords):
+    def update_matrix(self, mouse_coords):
         grain_coords: Coords = self.sand.get_grain_coords(mouse_coords)
         if grain_coords is None:
             return
         if self.matrix[grain_coords.x][grain_coords.y]:
             self.matrix[grain_coords.x][grain_coords.y] = False
+
+    def make_fall(self):
+        for row in self.matrix:
+            print(row)
+        print("\n\n")

@@ -1,9 +1,8 @@
 import colorsys
-from collections import namedtuple
 from tkinter import Canvas
 from typing import Optional
 
-from CONSTS import GridDimensions, Coords
+from CONSTS import GridDimensions, Coords, COLOR_CHANGE_SPEED, SATURATION, TRANSPARENCY, MARGIN
 
 
 class Sand:
@@ -20,12 +19,13 @@ class Sand:
         self.canvas = canvas
         self.square_side = square_side
 
-    def create_grain(self, mouse_pos: Coords, matrix: [[], ...]):
+    def create_grain(self, mouse_pos: Coords, matrix: [[], ...]) -> bool:
         grain_coords: Optional[Coords] = self.get_grain_coords(mouse_pos)
         if grain_coords is None:
-            return
+            return False
         if matrix[grain_coords.x][grain_coords.y]:
             self.draw_grain(grain_coords)
+        return True
 
     def get_grain_coords(self, mouse_pos: Coords) -> Optional[Coords]:
         grain_x = mouse_pos.x // self.square_side
@@ -39,10 +39,10 @@ class Sand:
 
     def draw_grain(self, grain_coords):
         self.canvas.create_rectangle(
-            grain_coords.x * self.square_side,
-            grain_coords.y * self.square_side,
-            grain_coords.x * self.square_side + self.square_side,
-            grain_coords.y * self.square_side + self.square_side,
+            grain_coords.x * self.square_side + MARGIN,
+            grain_coords.y * self.square_side + MARGIN,
+            grain_coords.x * self.square_side + self.square_side - MARGIN,
+            grain_coords.y * self.square_side + self.square_side - MARGIN,
             fill=self.get_next_color(),
             outline=""
         )
@@ -50,9 +50,9 @@ class Sand:
     def get_next_color(self):
         if self.hue > self.color_gradiant:
             self.hue = 0
-        rgb = colorsys.hsv_to_rgb(self.hue, 1, 1)
-        self.hue += 1 / self.color_gradiant
-        self.hue %= 10000  # cap hue at 1.0
+        rgb = colorsys.hsv_to_rgb(self.hue, SATURATION, TRANSPARENCY)
+        self.hue += COLOR_CHANGE_SPEED / self.color_gradiant
+        self.hue %= 1  # cap hue at 1.0
         r = round(rgb[0] * 255)
         g = round(rgb[1] * 255)
         b = round(rgb[2] * 255)

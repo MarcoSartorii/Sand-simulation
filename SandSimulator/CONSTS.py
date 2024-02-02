@@ -3,13 +3,18 @@ from typing import Final
 GridDimensions = namedtuple("GridDimensions", "WIDTH HEIGHT")
 Coords = namedtuple("Coords", "x, y")
 
-GRID: GridDimensions = GridDimensions(250, 250)  # 300x300
-GRAIN_SIDE_SIZE: Final = 3  # 2
-FPS: Final = 300  # suggested between 10 and 14
+GRID: GridDimensions = GridDimensions(5, 5)  # 250x250
+GRAIN_SIDE_SIZE: Final = 100 # 3
+FPS: Final = 10000  # suggested between 10 and 14
 BACKGROUND_COLOR: Final = "Black"
+MARGIN = 2
+COLOR_CHANGE_SPEED: int = 5
+TRANSPARENCY: float = 1 # range(0,1)
+SATURATION: float = 1 # range(0,1)
+
+
 DRAW_GRID_LINES: bool = False
 GRID_LINES_COLOR: Final = "White"
-
 """
 DONT MODIFY THESE
 """
