@@ -9,14 +9,6 @@ Event = namedtuple("Event", "char")
 MILLISECONDS: Final = 1000 // FPS
 
 
-def green(msg):
-    print(Colors().green + msg, end="")
-
-
-def red(msg):
-    print(Colors().red + msg, end="")
-
-
 class Simulation:
     window: tkinter.Tk
     canvas: tkinter.Canvas
