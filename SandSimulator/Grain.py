@@ -1,5 +1,4 @@
 from tkinter import Canvas
-
 from CONSTS import Coords, MARGIN
 
 
@@ -18,7 +17,6 @@ class Grain:
         self.coords = new_coords
 
     def draw(self):
-        print(self.coords.x, self.coords.y)
         self.canvas.create_rectangle(
             self.coords.x * self.square_side + MARGIN,
             self.coords.y * self.square_side + MARGIN,

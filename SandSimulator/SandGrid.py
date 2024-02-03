@@ -15,11 +15,9 @@ class SandGrid:
 
     def __init__(self, canvas: Canvas, grid: GridDimensions, square_side: int):
         self.hue = Hue(start_h=0, saturation=SATURATION, transparency=OPACITY, degrees=DEGREES)
-        self.color_gradiant = 360
         self.grid = grid
         self.canvas = canvas
         self.square_side = square_side
-        self.matrix = self.init_matrix(grid.WIDTH, grid.HEIGHT)
         self.matrix: Optional[Optional[Grain], ...] = self.init_matrix(grid.WIDTH, grid.HEIGHT)
 
     def add_grain(self, mouse_pos: Coords) -> type(None):

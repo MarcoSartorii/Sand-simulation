@@ -1,5 +1,5 @@
 from collections import namedtuple
-from typing import Final, Optional
+from typing import Final
 import tkinter
 from CONSTS import BACKGROUND_COLOR, WIDTH, HEIGHT, GRID, FPS, GRAIN_SIDE_SIZE, DRAW_GRID_LINES, Coords
 from SandGrid import SandGrid
@@ -45,9 +45,9 @@ class Simulation:
 
     def update(self):
         self.update_canvas()
-        mouse_x, mouse_y = self.get_mouse_pos()
-        mouse_coords = Coords(mouse_x, mouse_y)
         if self.is_mouse_pressed:
+            mouse_x, mouse_y = self.get_mouse_pos()
+            mouse_coords = Coords(mouse_x, mouse_y)
             self.sandGrid.add_grain(mouse_coords)
         self.sandGrid.fall()
         self.window.after(ms=MILLISECONDS, func=self.update)
