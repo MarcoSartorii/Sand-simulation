@@ -1,21 +1,20 @@
-import colorsys
 from tkinter import Canvas
 from typing import Optional
 
-from CONSTS import GridDimensions, Coords, COLOR_CHANGE_SPEED, SATURATION, TRANSPARENCY
+from CONSTS import GridDimensions, Coords, SATURATION, OPACITY, DEGREES
 from Grain import Grain
+from Hue import Hue
 
 
 class SandGrid:
     canvas: Canvas
     grid: GridDimensions
     square_side: int
-    hue: int
-    color_gradiant: int
+    hue: Hue
     matrix: Optional
 
     def __init__(self, canvas: Canvas, grid: GridDimensions, square_side: int):
-        self.hue = 0
+        self.hue = Hue(start_h=0, saturation=SATURATION, transparency=OPACITY, degrees=DEGREES)
         self.color_gradiant = 360
         self.grid = grid
         self.canvas = canvas
@@ -29,7 +28,7 @@ class SandGrid:
             return
         if self.matrix[grain.coords.y][grain.coords.x] is None:  # if the position is free
             self.matrix[grain.coords.y][grain.coords.x] = Grain(coords=grain.coords, canvas=self.canvas,
-                                                                color=self.get_next_color(),
+                                                                color=self.hue.next_color(),
                                                                 square_side=self.square_side)
         self.matrix[grain.coords.y][grain.coords.x].draw()
 
@@ -44,24 +43,8 @@ class SandGrid:
         return grain_x in range(0, width) and grain_y in range(0, height)
 
     def draw_grain(self, grain_coords):
-        self.matrix[grain_coords.y][grain_coords.x] = Grain(coords=grain_coords, color=self.get_next_color(),
+        self.matrix[grain_coords.y][grain_coords.x] = Grain(coords=grain_coords, color=self.hue.next_color(),
                                                             canvas=self.canvas, square_side=self.square_side)
-
-    def get_next_color(self):
-        if self.hue > self.color_gradiant:
-            self.hue = 0
-        rgb = colorsys.hsv_to_rgb(self.hue, SATURATION, TRANSPARENCY)
-        self.hue += COLOR_CHANGE_SPEED / self.color_gradiant
-        self.hue %= 1  # cap hue at 1.0
-        r = round(rgb[0] * 255)
-        g = round(rgb[1] * 255)
-        b = round(rgb[2] * 255)
-        rgb_ints = (r, g, b)
-        return self._from_rgb(rgb_ints)
-
-    @staticmethod
-    def _from_rgb(rgb):
-        return "#%02x%02x%02x" % rgb
 
     def fall(self):
         return

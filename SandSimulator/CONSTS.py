@@ -9,8 +9,9 @@ FPS: Final = 10000  # suggested between 10 and 14
 BACKGROUND_COLOR: Final = "Black"
 MARGIN = 1
 COLOR_CHANGE_SPEED: int = 5
-TRANSPARENCY: float = 1  # range(0,1)
+OPACITY: float = 1  # range(0,1)
 SATURATION: float = 1  # range(0,1)
+DEGREES: int = 180  # range(0,1)
 
 
 DRAW_GRID_LINES: bool = True
