@@ -1,28 +1,33 @@
 from collections import namedtuple
-from typing import Final
+from typing import Final, Optional
 import tkinter
 from CONSTS import BACKGROUND_COLOR, WIDTH, HEIGHT, GRID, FPS, GRAIN_SIDE_SIZE, DRAW_GRID_LINES, Coords
-from Sand import Sand
+from SandGrid import SandGrid
 from Colors import Colors
 
 Event = namedtuple("Event", "char")
 MILLISECONDS: Final = 1000 // FPS
 
 
+def green(msg):
+    print(Colors().green + msg, end="")
+
+
+def red(msg):
+    print(Colors().red + msg, end="")
+
 
 class Simulation:
     window: tkinter.Tk
     canvas: tkinter.Canvas
     is_mouse_pressed: bool
-    sand: Sand
-    matrix: [[], ...]
+    sandGrid: SandGrid
 
     def __init__(self):
         self.is_mouse_pressed = False
         self.init_gui()
         self.init_key_binds()
-        self.sand = Sand(self.canvas, GRID, GRAIN_SIDE_SIZE)
-        self.matrix = self.init_matrix()
+        self.sandGrid = SandGrid(self.canvas, GRID, GRAIN_SIDE_SIZE)
 
     def init_gui(self):
         self.window = tkinter.Tk()
@@ -43,8 +48,8 @@ class Simulation:
         mouse_x, mouse_y = self.get_mouse_pos()
         mouse_coords = Coords(mouse_x, mouse_y)
         if self.is_mouse_pressed:
-            self.draw_grain(mouse_coords)
-        self.make_fall()
+            self.sandGrid.add_grain(mouse_coords)
+        self.sandGrid.fall()
         self.window.after(ms=MILLISECONDS, func=self.update)
 
     def update_canvas(self):
@@ -72,10 +77,6 @@ class Simulation:
             self.window.winfo_pointery() - self.window.winfo_rooty()
         )
 
-    def draw_grain(self, mouse_coords: Coords):
-        if self.sand.create_grain(mouse_coords, self.matrix):
-            self.update_matrix(mouse_coords)
-
     def draw_grid_lines(self):
         for i in range(0, GRID.WIDTH):
             self.canvas.create_line(
@@ -90,29 +91,3 @@ class Simulation:
                 GRID.WIDTH * GRAIN_SIDE_SIZE,
                 i * GRAIN_SIDE_SIZE,
             )
-
-    @staticmethod
-    def init_matrix():
-        matrix: [[], ...] = []
-        for _ in range(0, GRID.HEIGHT):
-            row = []
-            for _ in range(0, GRID.WIDTH):
-                row.append(True)
-            matrix.append(row)
-        return matrix
-
-    def update_matrix(self, mouse_coords):
-        grain_coords: Coords = self.sand.get_grain_coords(mouse_coords)
-        # I inverted x and y because the matrix would be transposed
-        if self.matrix[grain_coords.y][grain_coords.x]:
-            self.matrix[grain_coords.y][grain_coords.x] = False
-
-    def make_fall(self):
-        for row in self.matrix:
-            for val in row:
-                if val:
-                    print(Colors().green + str(val), end=" ")
-                else:
-                    print(Colors().red + str(val), end=" ")
-            print("\n")
-        print("\n\n\n")
