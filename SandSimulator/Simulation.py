@@ -3,9 +3,11 @@ from typing import Final
 import tkinter
 from CONSTS import BACKGROUND_COLOR, WIDTH, HEIGHT, GRID, FPS, GRAIN_SIDE_SIZE, DRAW_GRID_LINES, Coords
 from Sand import Sand
+from Colors import Colors
 
 Event = namedtuple("Event", "char")
 MILLISECONDS: Final = 1000 // FPS
+
 
 
 class Simulation:
@@ -41,8 +43,7 @@ class Simulation:
         mouse_x, mouse_y = self.get_mouse_pos()
         mouse_coords = Coords(mouse_x, mouse_y)
         if self.is_mouse_pressed:
-            if self.draw_grain(mouse_coords):
-                self.update_matrix(mouse_coords)
+            self.draw_grain(mouse_coords)
         self.make_fall()
         self.window.after(ms=MILLISECONDS, func=self.update)
 
@@ -71,8 +72,9 @@ class Simulation:
             self.window.winfo_pointery() - self.window.winfo_rooty()
         )
 
-    def draw_grain(self, mouse_coords: Coords) -> bool:
-        return self.sand.create_grain(mouse_coords, self.matrix)
+    def draw_grain(self, mouse_coords: Coords):
+        if self.sand.create_grain(mouse_coords, self.matrix):
+            self.update_matrix(mouse_coords)
 
     def draw_grid_lines(self):
         for i in range(0, GRID.WIDTH):
@@ -101,12 +103,16 @@ class Simulation:
 
     def update_matrix(self, mouse_coords):
         grain_coords: Coords = self.sand.get_grain_coords(mouse_coords)
-        if grain_coords is None:
-            return
-        if self.matrix[grain_coords.x][grain_coords.y]:
-            self.matrix[grain_coords.x][grain_coords.y] = False
+        # I inverted x and y because the matrix would be transposed
+        if self.matrix[grain_coords.y][grain_coords.x]:
+            self.matrix[grain_coords.y][grain_coords.x] = False
 
     def make_fall(self):
         for row in self.matrix:
-            print(row)
-        print("\n\n")
+            for val in row:
+                if val:
+                    print(Colors().green + str(val), end=" ")
+                else:
+                    print(Colors().red + str(val), end=" ")
+            print("\n")
+        print("\n\n\n")

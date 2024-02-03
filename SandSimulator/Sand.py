@@ -23,9 +23,10 @@ class Sand:
         grain_coords: Optional[Coords] = self.get_grain_coords(mouse_pos)
         if grain_coords is None:
             return False
-        if matrix[grain_coords.x][grain_coords.y]:
+        if matrix[grain_coords.y][grain_coords.x]:
             self.draw_grain(grain_coords)
-        return True
+            return True
+        return False
 
     def get_grain_coords(self, mouse_pos: Coords) -> Optional[Coords]:
         grain_x = mouse_pos.x // self.square_side
